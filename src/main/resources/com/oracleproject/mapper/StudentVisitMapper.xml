@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracleproject.mapper.StudentVisitMapper">
+
+    <!-- 模糊查询学生参观记录 -->
+    <select id="findVisitList"
+            parameterType="com.oracleproject.vo.VisitQueryVO"
+            resultType="com.oracleproject.vo.StudentVisitVO">
+
+        select
+        rel.rel_id as relId,
+        stu.sid as sid,
+        stu.sname as sname,
+        stu.classname as className,
+        build.id as buildId,
+        build.building_name as buildingName,
+        rel.score as score,
+        rel.visit_time as visitTime
+
+        from student_build_rel rel
+
+        join shanxi_ancient_student stu
+        on rel.sid = stu.sid
+
+        join sx_ancient_buildings build
+        on rel.build_id = build.id
+
+        <where>
+
+            rel.is_delete = 0
+            and stu.is_delete = 0
+            and build.is_deleted = 0
+
+            <!-- 关键字模糊查询 -->
+            <if test="keyword != null and keyword != ''">
+                and (
+                stu.sname like '%' || #{keyword} || '%'
+                or
+                build.building_name like '%' || #{keyword} || '%'
+                )
+            </if>
+
+            <!-- 专业筛选 -->
+            <if test="classname != null and classname != ''">
+                and stu.classname like '%' || #{classname} || '%'
+            </if>
+
+            <!-- 城市筛选 -->
+            <if test="areaCode != null and areaCode != ''">
+                and build.area_code like #{areaCode}
+            </if>
+
+            <!-- 日期筛选 -->
+
+            <if test="visitTime != null">
+
+                and trunc(rel.visit_time)=trunc(#{visitTime})
+
+            </if>
+
+        </where>
+
+        order by rel.visit_time desc
+
+    </select>
+
+    <!-- 逻辑删除参观记录 -->
+    <update id="deleteRel"
+            parameterType="java.lang.Integer">
+
+        update student_build_rel
+        set is_delete = 1
+        where rel_id = #{relId}
+
+    </update>
+
+</mapper>

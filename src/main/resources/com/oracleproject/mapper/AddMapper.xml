@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracleproject.mapper.AddMapper">
+
+    <!-- 新增学生 -->
+    <insert id="insertStudent" parameterType="com.oracleproject.model.Student">
+        INSERT INTO SHANXI_ANCIENT_STUDENT (SID, SNAME, GENDER, CLASSNAME,IS_DELETE)
+        VALUES (#{sid}, #{sname}, #{gender},#{classname},0)
+    </insert>
+
+    <!-- 新增：根据ID查询学生 -->
+    <select id="selectStudentById" parameterType="int" resultType="com.oracleproject.model.Student">
+        SELECT SID, SNAME, GENDER, CLASSNAME, IS_DELETE
+        FROM SHANXI_ANCIENT_STUDENT
+        WHERE SID = #{sid} AND IS_DELETE = 0
+    </select>
+
+    <!--不考虑是否逻辑删除-->
+    <select id="selectStudentByIdAll" parameterType="int" resultType="com.oracleproject.model.Student">
+        SELECT SID, SNAME, GENDER, CLASSNAME, IS_DELETE
+        FROM SHANXI_ANCIENT_STUDENT
+        WHERE SID = #{sid}
+    </select>
+
+    <!-- 新增：新增学生-建筑关联记录 -->
+    <insert id="insertStudentBuildingRel" parameterType="com.oracleproject.model.StudentBuildingRel">
+        INSERT INTO STUDENT_BUILD_REL (
+            REL_ID, SID, BUILD_ID, SCORE, VISIT_TIME, IS_DELETE
+        ) VALUES (
+                    SEQ_REF_ID.NEXTVAL,
+                    #{sid,jdbcType=NUMERIC},
+                    #{buildId,jdbcType=NUMERIC},
+                    #{score,jdbcType=NUMERIC},
+                    #{visitTime,jdbcType=TIMESTAMP},
+                    #{isDelete,jdbcType=NUMERIC}
+                 )
+    </insert>
+
+    <update id="updateRel" parameterType="com.oracleproject.model.StudentBuildingRel">
+        UPDATE STUDENT_BUILD_REL
+        SET
+            SID = #{sid},
+            BUILD_ID = #{buildId},
+            SCORE = #{score},
+            VISIT_TIME = #{visitTime}
+        WHERE REL_ID = #{relId}
+    </update>
+
+    <update id="updateStudent" parameterType="com.oracleproject.model.Student">
+        UPDATE SHANXI_ANCIENT_STUDENT
+        SET
+            SNAME = #{sname},
+            GENDER = #{gender},
+            CLASSNAME = #{classname},
+            IS_DELETE = #{isDelete}
+        WHERE SID = #{sid}
+    </update>
+
+</mapper>

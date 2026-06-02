@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oracleproject.mapper.BuildingMapper">
+
+    <!-- 根据ID查询建筑详情 -->
+    <select id="findById"
+            parameterType="java.lang.Integer"
+            resultType="com.oracleproject.model.Building">
+
+        select
+            id,
+            area_code as areaCode,
+            area_name as areaName,
+            building_name as buildingName,
+            address,
+            build_year as buildYear,
+            protection_level as protectionLevel,
+            build_type as buildType,
+            introduction,
+            is_deleted as isDelete
+
+        from sx_ancient_buildings
+
+        where id = #{id}
+          and is_deleted = 0
+
+    </select>
+
+</mapper>

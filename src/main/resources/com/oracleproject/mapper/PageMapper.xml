@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracleproject.mapper.PageMapper">
+    <!-- 原有结果映射保留 -->
+    <resultMap id="BuildingResultMap" type="com.oracleproject.model.Building">
+        <id column="ID" property="id"/>
+        <result column="AREA_CODE" property="areaCode"/>
+        <result column="AREA_NAME" property="areaName"/>
+        <result column="BUILDING_NAME" property="buildingName"/>
+        <result column="BUILD_YEAR" property="buildYear"/>
+        <result column="PROTECTION_LEVEL" property="protectionLevel"/>
+        <result column="INTRODUCTION" property="introduction"/>
+        <result column="IS_DELETED" property="isDeleted"/>
+    </resultMap>
+
+    <select id="selectPage" resultMap="BuildingResultMap">
+        select * from (
+        select a.*, rownum rn from (
+        select id, area_name, building_name, build_year, protection_level, introduction
+        from sx_ancient_buildings
+        where is_deleted = 0
+        order by id desc
+        ) a where rownum &lt;= #{end}
+        ) where rn &gt; #{start}
+    </select>
+
+    <select id="selectCount" resultType="java.lang.Long">
+        select count(*) from sx_ancient_buildings where is_deleted = 0
+    </select>
+
+    <update id="deleteBuilding" parameterType="int">
+        update sx_ancient_buildings
+        set is_deleted = 1
+        where id = #{id}
+    </update>
+
+    <select id="selectAllDeletedBuildings" resultMap="BuildingResultMap">
+        SELECT ID, AREA_NAME, BUILDING_NAME, BUILD_YEAR, PROTECTION_LEVEL, INTRODUCTION, IS_DELETED
+        FROM sx_ancient_buildings
+        WHERE is_deleted = 1
+        ORDER BY ID DESC
+    </select>
+
+    <update id="restoreBuilding" parameterType="int">
+        UPDATE sx_ancient_buildings
+        SET IS_DELETED = 0
+        WHERE ID = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!-- 全局字符编码过滤器 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Spring 根容器：管理 Service、Mapper、事务 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring.xml</param-value>
+    </context-param>
+
+    <!-- ========== Servlet 映射（传统 JavaWeb Controller 层） ========== -->
+
+    <!-- 参观记录列表、删除 -->
+    <servlet>
+        <servlet-name>StudentVisitServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.StudentVisitServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentVisitServlet</servlet-name>
+        <url-pattern>/visit/list</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StudentVisitServlet</servlet-name>
+        <url-pattern>/visit/deleteRel</url-pattern>
+    </servlet-mapping>
+
+    <!-- 学生详情、删除 -->
+    <servlet>
+        <servlet-name>StudentServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.StudentServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentServlet</servlet-name>
+        <url-pattern>/student/detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StudentServlet</servlet-name>
+        <url-pattern>/student/delete</url-pattern>
+    </servlet-mapping>
+
+    <!-- 修改学生页面跳转 -->
+    <servlet>
+        <servlet-name>StudentPageServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.StudentPageServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentPageServlet</servlet-name>
+        <url-pattern>/student/toUpdatePage</url-pattern>
+    </servlet-mapping>
+
+    <!-- 新增学生 JSON -->
+    <servlet>
+        <servlet-name>StudentAddServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.StudentAddServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentAddServlet</servlet-name>
+        <url-pattern>/student/add</url-pattern>
+    </servlet-mapping>
+
+    <!-- 建筑分页、删除、恢复 -->
+    <servlet>
+        <servlet-name>BuildingPageServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.BuildingPageServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BuildingPageServlet</servlet-name>
+        <url-pattern>/building/page</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BuildingPageServlet</servlet-name>
+        <url-pattern>/building/delete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BuildingPageServlet</servlet-name>
+        <url-pattern>/building/restore</url-pattern>
+    </servlet-mapping>
+
+    <!-- 建筑详情 -->
+    <servlet>
+        <servlet-name>BuildingDetailServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.BuildingDetailServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BuildingDetailServlet</servlet-name>
+        <url-pattern>/building/detail</url-pattern>
+    </servlet-mapping>
+
+    <!-- 参观记录增改、学生修改 JSON -->
+    <servlet>
+        <servlet-name>RelServlet</servlet-name>
+        <servlet-class>com.oracleproject.servlet.RelServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RelServlet</servlet-name>
+        <url-pattern>/rel/add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RelServlet</servlet-name>
+        <url-pattern>/rel/update</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RelServlet</servlet-name>
+        <url-pattern>/rel/updateStudent</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>
