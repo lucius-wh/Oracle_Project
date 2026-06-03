@@ -1,249 +1,152 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <title>古建筑分页查询</title>
-    <style>
-        /* 原有样式完全不动 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "微软雅黑", sans-serif;
-        }
-        .container {
-            width: 95%;
-            margin: 30px auto;
-        }
-        /* ========== 新增：返回按钮容器样式 ========== */
-        .back-box {
-            text-align: left;
-            margin-bottom: 15px;
-        }
-        /* 新增：返回首页按钮样式，和系统主色调统一 */
-        .back-btn {
-            display: inline-block;
-            padding: 6px 16px;
-            background-color: #409eff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 3px;
-            font-size: 14px;
-        }
-        .back-btn:hover {
-            background-color: #66b1ff;
-        }
-        /* ======================================== */
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-        }
-        /* 正常数据表格 */
-        .normal-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .normal-table th, .normal-table td {
-            border: 1px solid #ccc;
-            padding: 12px 8px;
-        }
-        .normal-table th {
-            background-color: #409eff;
-            color: #fff;
-        }
-        .normal-table tr:nth-child(even) {
-            background-color: #f5f7fa;
-        }
-        /* 已删除数据表格 */
-        .deleted-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-            margin-top: 40px;
-            border: 1px solid #eee;
-        }
-        .deleted-table th, .deleted-table td {
-            border: 1px solid #eee;
-            padding: 12px 8px;
-            color: #999;
-        }
-        .deleted-table th {
-            background-color: #e4e7ed;
-            color: #666;
-        }
-        /* 分页栏 */
-        .page-box {
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-        .page-box a {
-            display: inline-block;
-            padding: 6px 14px;
-            margin: 0 5px;
-            border: none;
-            background: #409eff;
-            color: white;
-            text-decoration: none;
-            border-radius: 3px;
-        }
-        .page-box a.disabled {
-            background: #999;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .page-info {
-            margin: 0 15px;
-            color: #666;
-        }
-        .intro-td {
-            text-align: left;
-            line-height: 1.5;
-        }
-        /* 按钮样式 */
-        .delete-btn {
-            background: #f56c6c;
-            padding: 5px 10px;
-            color: white;
-            text-decoration: none;
-            border-radius: 3px;
-            font-size: 14px;
-        }
-        .restore-btn {
-            background: #67c23a;
-            padding: 5px 10px;
-            color: white;
-            text-decoration: none;
-            border-radius: 3px;
-            font-size: 14px;
-        }
-        /* 已删除数据标题 */
-        .deleted-title {
-            text-align: center;
-            margin: 40px 0 20px;
-            color: #999;
-            font-size: 18px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-    </style>
+    <%@ include file="/includes/head.jsp" %>
 </head>
-<body>
-<div class="container">
-    <!-- ========== 新增：返回首页按钮（页面左上角） ========== -->
-    <div class="back-box">
-        <%-- 跳转到项目根目录 index.jsp 首页 --%>
-        <a href="${pageContext.request.contextPath}/index.jsp" class="back-btn">← 返回首页</a>
+<body class="page-bg font-sans text-ink antialiased">
+<div id="page-loader"><div class="spinner"></div></div>
+
+<header class="glass-nav sticky top-0 z-40">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
+        <a href="${pageContext.request.contextPath}/index.jsp" class="btn-ghost -ml-2">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            返回首页
+        </a>
+        <span class="text-sm font-semibold text-ink">建筑目录</span>
+        <div class="w-20"></div>
     </div>
-    <!-- ================================================ -->
+</header>
 
-    <!-- 正常数据表格：所有页都显示，保持不变 -->
-    <h2>古建筑信息列表（正常数据）</h2>
-    <table class="normal-table">
-        <thead>
-        <tr>
-            <th>所属地区</th>
-            <th>建筑名称</th>
-            <th>建造年代</th>
-            <th>保护等级</th>
-            <th>建筑介绍</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:if test="${empty pageBean.list}">
-            <tr>
-                <td colspan="6">暂无正常数据</td>
-            </tr>
-        </c:if>
-        <c:forEach items="${pageBean.list}" var="building">
-            <tr>
-                <td>${building.areaName}</td>
-                <td>${building.buildingName}</td>
-                <td>${building.buildYear == null ? "未知" : building.buildYear}</td>
-                <td>${building.protectionLevel == null ? "无等级" : building.protectionLevel}</td>
-                <td class="intro-td">${building.introduction == null ? "暂无介绍" : building.introduction}</td>
-                <td>
-                    <a href="javascript:;" class="delete-btn" onclick="confirmDelete(${building.id})">删除</a>
-                </td>
-            </tr>
-        </c:forEach>
-        </tbody>
-    </table>
+<main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <section class="mb-8 text-center sm:text-left" data-animate>
+        <h1 class="text-2xl font-bold tracking-tight text-ink sm:text-3xl">古建筑信息列表</h1>
+        <p class="mt-2 text-sm text-ink-muted">正常数据 · 分页浏览与管理</p>
+    </section>
 
-    <!-- 分页栏：所有页都显示，保持不变 -->
-    <div class="page-box">
-        <c:choose>
-            <c:when test="${pageBean.pageNum == 1}">
-                <a href="javascript:;" class="disabled">首页</a>
-                <a href="javascript:;" class="disabled">上一页</a>
-            </c:when>
-            <c:otherwise>
-                <a href="${pageContext.request.contextPath}/building/page?pageNum=1">首页</a>
-                <a href="${pageContext.request.contextPath}/building/page?pageNum=${pageBean.pageNum - 1}">上一页</a>
-            </c:otherwise>
-        </c:choose>
-        <span class="page-info">
-            当前第${pageBean.pageNum}页 / 共${pageBean.pages}页 总数据：${pageBean.total}条
-        </span>
-        <c:choose>
-            <c:when test="${pageBean.pageNum == pageBean.pages || pageBean.pages == 0}">
-                <a href="javascript:;" class="disabled">下一页</a>
-                <a href="javascript:;" class="disabled">尾页</a>
-            </c:when>
-            <c:otherwise>
-                <a href="${pageContext.request.contextPath}/building/page?pageNum=${pageBean.pageNum + 1}">下一页</a>
-                <a href="${pageContext.request.contextPath}/building/page?pageNum=${pageBean.pages}">尾页</a>
-            </c:otherwise>
-        </c:choose>
-        <span style="margin-left: 10px;">
-            <input type="number" id="pageInput" min="1" max="${pageBean.pages}" placeholder="输入页码" style="padding: 5px; width: 60px; text-align: center;">
-            <button onclick="jumpPage()" style="padding: 5px 10px; background: #409eff; color: white; border: none; border-radius: 3px; cursor: pointer;">跳转</button>
-        </span>
-    </div>
-
-    <!-- 🔥 关键修改：已删除数据的标题和表格，仅在最后一页渲染 -->
-    <c:if test="${isLastPage}">
-        <h3 class="deleted-title">已删除数据（可恢复）</h3>
-        <table class="deleted-table">
+    <div class="table-shell mb-8 overflow-x-auto" data-animate>
+        <table class="data-table min-w-[800px]">
             <thead>
             <tr>
                 <th>所属地区</th>
                 <th>建筑名称</th>
                 <th>建造年代</th>
                 <th>保护等级</th>
-                <th>建筑介绍</th>
-                <th>操作</th>
+                <th class="min-w-[200px]">建筑介绍</th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
             <tbody>
-            <c:if test="${empty deletedList}">
+            <c:if test="${empty pageBean.list}">
                 <tr>
-                    <td colspan="6">暂无已删除数据</td>
+                    <td colspan="6" class="py-12 text-center text-ink-muted">暂无正常数据</td>
                 </tr>
             </c:if>
-            <c:forEach items="${deletedList}" var="building">
+            <c:forEach items="${pageBean.list}" var="building">
                 <tr>
-                    <td>${building.areaName}</td>
+                    <td class="font-medium">${building.areaName}</td>
                     <td>${building.buildingName}</td>
-                    <td>${building.buildYear == null ? "未知" : building.buildYear}</td>
-                    <td>${building.protectionLevel == null ? "无等级" : building.protectionLevel}</td>
-                    <td class="intro-td">${building.introduction == null ? "暂无介绍" : building.introduction}</td>
+                    <td class="text-ink-muted">${building.buildYear == null ? "未知" : building.buildYear}</td>
                     <td>
-                        <a href="javascript:;" class="restore-btn" onclick="confirmRestore(${building.id})">恢复</a>
+                        <span class="inline-flex rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent">
+                            ${building.protectionLevel == null ? "无等级" : building.protectionLevel}
+                        </span>
+                    </td>
+                    <td class="max-w-xs text-left text-sm leading-relaxed text-ink-muted line-clamp-2">
+                        ${building.introduction == null ? "暂无介绍" : building.introduction}
+                    </td>
+                    <td class="text-center">
+                        <a href="javascript:;" onclick="confirmDelete(${building.id})"
+                           class="btn-danger !px-3 !py-1.5 !text-xs">删除</a>
                     </td>
                 </tr>
             </c:forEach>
             </tbody>
         </table>
+    </div>
+
+    <nav class="mb-10 flex flex-wrap items-center justify-center gap-2 sm:gap-3" data-animate aria-label="分页">
+        <c:choose>
+            <c:when test="${pageBean.pageNum == 1}">
+                <span class="inline-flex cursor-not-allowed items-center rounded-2xl bg-black/5 px-4 py-2 text-sm text-ink-faint">首页</span>
+                <span class="inline-flex cursor-not-allowed items-center rounded-2xl bg-black/5 px-4 py-2 text-sm text-ink-faint">上一页</span>
+            </c:when>
+            <c:otherwise>
+                <a href="${pageContext.request.contextPath}/building/page?pageNum=1" class="btn-secondary !py-2 !text-sm">首页</a>
+                <a href="${pageContext.request.contextPath}/building/page?pageNum=${pageBean.pageNum - 1}" class="btn-secondary !py-2 !text-sm">上一页</a>
+            </c:otherwise>
+        </c:choose>
+
+        <span class="mx-2 rounded-2xl bg-white px-4 py-2 text-sm text-ink-muted shadow-glow">
+            第 <strong class="text-ink">${pageBean.pageNum}</strong> / ${pageBean.pages} 页 · 共 ${pageBean.total} 条
+        </span>
+
+        <c:choose>
+            <c:when test="${pageBean.pageNum == pageBean.pages || pageBean.pages == 0}">
+                <span class="inline-flex cursor-not-allowed items-center rounded-2xl bg-black/5 px-4 py-2 text-sm text-ink-faint">下一页</span>
+                <span class="inline-flex cursor-not-allowed items-center rounded-2xl bg-black/5 px-4 py-2 text-sm text-ink-faint">尾页</span>
+            </c:when>
+            <c:otherwise>
+                <a href="${pageContext.request.contextPath}/building/page?pageNum=${pageBean.pageNum + 1}" class="btn-secondary !py-2 !text-sm">下一页</a>
+                <a href="${pageContext.request.contextPath}/building/page?pageNum=${pageBean.pages}" class="btn-secondary !py-2 !text-sm">尾页</a>
+            </c:otherwise>
+        </c:choose>
+
+        <div class="mt-2 flex w-full basis-full items-center justify-center gap-2 sm:mt-0 sm:w-auto sm:basis-auto">
+            <input type="number" id="pageInput" min="1" max="${pageBean.pages}" placeholder="页码"
+                   class="input-field !w-20 !py-2 text-center">
+            <button type="button" onclick="jumpPage()" class="btn-primary !py-2">跳转</button>
+        </div>
+    </nav>
+
+    <c:if test="${isLastPage}">
+        <section class="mb-8" data-animate>
+            <div class="mb-4 flex items-center gap-3">
+                <div class="h-px flex-1 bg-black/10"></div>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-ink-faint">已删除 · 可恢复</h2>
+                <div class="h-px flex-1 bg-black/10"></div>
+            </div>
+            <div class="table-shell overflow-x-auto opacity-90">
+                <table class="data-table min-w-[800px]">
+                    <thead>
+                    <tr>
+                        <th>所属地区</th>
+                        <th>建筑名称</th>
+                        <th>建造年代</th>
+                        <th>保护等级</th>
+                        <th>建筑介绍</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody class="text-ink-muted">
+                    <c:if test="${empty deletedList}">
+                        <tr>
+                            <td colspan="6" class="py-10 text-center">暂无已删除数据</td>
+                        </tr>
+                    </c:if>
+                    <c:forEach items="${deletedList}" var="building">
+                        <tr>
+                            <td>${building.areaName}</td>
+                            <td>${building.buildingName}</td>
+                            <td>${building.buildYear == null ? "未知" : building.buildYear}</td>
+                            <td>${building.protectionLevel == null ? "无等级" : building.protectionLevel}</td>
+                            <td class="max-w-xs text-left text-sm line-clamp-2">${building.introduction == null ? "暂无介绍" : building.introduction}</td>
+                            <td class="text-center">
+                                <a href="javascript:;" onclick="confirmRestore(${building.id})"
+                                   class="btn-success !px-3 !py-1.5 !text-xs">恢复</a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </c:if>
-</div>
+</main>
 
 <script>
-    // 原有跳转、删除、恢复函数，完全不动
     function jumpPage() {
         let pageNum = document.getElementById("pageInput").value;
         let totalPages = ${pageBean.pages};
@@ -264,5 +167,6 @@
         }
     }
 </script>
+<%@ include file="/includes/footer-scripts.jsp" %>
 </body>
 </html>
